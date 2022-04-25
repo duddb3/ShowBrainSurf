@@ -7,7 +7,7 @@ You want to create a figure showing a subset of atlas defined ROIs. Currently, S
 usage:
 > showbrainsurf;
 
-Two popup menus will appear, the first allowing selection of the atlas and the second allowing for the selection of any number of ROIs defined by that atlas. Each selected ROI will be displayed in a unique color selected from a set of maximally distinguishable colors based on the number of ROIs selected. The result may look like:
+Two popup menus will appear, the first allowing selection of the atlas and the second allowing for the selection of any number of ROIs defined by that atlas. Each selected ROI will be displayed in a unique color selected from a set of maximally distinguishable colors based on the number of ROIs selected. In the following example 12 regions were chosen from the Destrieux atlas (10 regions corresponding to the insula and 2 regions corresponding to the prefrontal gyrus):
 ![Example_Destrieux_SelectROIs](https://user-images.githubusercontent.com/98111478/165158176-fb292ca1-a964-46a6-b383-5345658b7ebb.png)
 
 
