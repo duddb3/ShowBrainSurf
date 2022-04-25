@@ -1,6 +1,6 @@
-function [LL,LM,RL,RM,S,I] = showbrainsurf(cdata,varargin)
+function [LL,LM,RL,RM,S,I] = showbrainsurf(cdata,drange,surftype)
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
-% showbrainsurf, version 1.0
+% showbrainsurf, version 1.1.0
 %
 % Software provided with no warranty or guarantee
 %
@@ -55,6 +55,16 @@ function [LL,LM,RL,RM,S,I] = showbrainsurf(cdata,varargin)
 %   >> showbrainsurf(X,[min max]);
 %       Same as above, but first thresholds X between min and max
 %
+%   >> showbrainsurf(X,[min max],mesh);
+%       Same as above, but renders explicitly on the mesh indictated by "mesh".
+%       Options are 'inflated', 'centralFS', and 'centralT1'
+%
+%
+%   Version history
+%
+%   1.0.0: initial release
+%   1.1.0: added functionality to render on different meshes
+%
 %
 %   This function utilizes the following 
 %
@@ -68,7 +78,7 @@ function [LL,LM,RL,RM,S,I] = showbrainsurf(cdata,varargin)
 %       https://www.mathworks.com/matlabcentral/fileexchange/29702-generate-maximally-perceptually-distinct-colorsCopyright 
 %
     pth = fileparts(which('showbrainsurf'));
-    addpath(genpath(pth));
+    addpath(fullfile(pth,'subfunctions'));
     if ~exist('cdata','var')
         pickrois = true;
         atlases = {'Gordon','Destrieux','DK40','HCP_MMP','Schaefer'};
@@ -91,10 +101,29 @@ function [LL,LM,RL,RM,S,I] = showbrainsurf(cdata,varargin)
     else
         pickrois = false;
     end
+    if exist('surftype','var')
+        switch surftype
+            case 'inflated'
+                surfname = 'inflated.freesurfer.gii';
+            case 'centralFS'
+                surfname = 'central.freesurfer.gii';
+            case 'centralT1'
+                surfname = 'central.Template_T1.gii';
+            otherwise
+                fprintf(2,sprintf('Surface name not recognized. Third input must be one of: ''%s'', ''%s'', or ''%s''\n','inflated','centralFS','centralT1'));
+        end
+    else
+        surfname = 'inflated.freesurfer.gii';
+    end
     if size(cdata,2)==1
-        if nargin==2
-            mn = varargin{1}(1);
-            mx = varargin{1}(2);
+        if exist('drange','var')
+            if isempty(drange)
+                mn = min(cdata);
+                mx = max(cdata);
+            else
+                mn = drange(1);
+                mx = drange(2);
+            end
         else
             mn = min(cdata);
             mx = max(cdata);
@@ -134,20 +163,20 @@ function [LL,LM,RL,RM,S,I] = showbrainsurf(cdata,varargin)
     switch size(cdata,1)
         case 64984 % vertex-level data at 32k/hemisphere (~2mm spacing)
             tdir = fullfile(pth,'templates','templates_surfaces_32k');
-            L = gifti(fullfile(tdir,'lh.inflated.freesurfer.gii'));
-            R = gifti(fullfile(tdir,'rh.inflated.freesurfer.gii'));
+            L = gifti(fullfile(tdir,['lh.' surfname]));
+            R = gifti(fullfile(tdir,['rh.' surfname]));
             ldata = cdata(1:length(L.vertices),:);
             rdata = cdata(length(L.vertices)+1:end,:);
         case 327684 % vertex-level data at ~1mm spacing
             tdir = fullfile(pth,'templates','templates_surfaces');
-            L = gifti(fullfile(tdir,'lh.inflated.freesurfer.gii'));
-            R = gifti(fullfile(tdir,'rh.inflated.freesurfer.gii'));
+            L = gifti(fullfile(tdir,['lh.' surfname]));
+            R = gifti(fullfile(tdir,['rh.' surfname]));
             ldata = cdata(1:length(L.vertices),:);
             rdata = cdata(length(L.vertices)+1:end,:);
         case 333 % Gordon functional atlas
             tdir = fullfile(pth,'templates','templates_surfaces_32k');
-            L = gifti(fullfile(tdir,'lh.inflated.freesurfer.gii'));
-            R = gifti(fullfile(tdir,'rh.inflated.freesurfer.gii'));
+            L = gifti(fullfile(tdir,['lh.' surfname]));
+            R = gifti(fullfile(tdir,['rh.' surfname]));
             gdir = 'C:\Users\duddb3\Documents\GordonAtlas\Parcels\';
             GL = gifti(fullfile(gdir,'Parcels_L.func.gii'));
             GR = gifti(fullfile(gdir,'Parcels_R.func.gii'));
@@ -175,8 +204,8 @@ function [LL,LM,RL,RM,S,I] = showbrainsurf(cdata,varargin)
         otherwise % atlas-defined data
             adir = fullfile(pth,'templates','atlases_surfaces');
             tdir = fullfile(pth,'templates','templates_surfaces');
-            L = gifti(fullfile(tdir,'lh.inflated.freesurfer.gii'));
-            R = gifti(fullfile(tdir,'rh.inflated.freesurfer.gii'));
+            L = gifti(fullfile(tdir,['lh.' surfname]));
+            R = gifti(fullfile(tdir,['rh.' surfname]));
             switch size(cdata,1)
                 case 148 % Destrieux
                     [~,llab,lctab] = read_annotation(fullfile(adir,'lh.aparc_a2009s.freesurfer.annot'),0);
