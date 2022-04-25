@@ -1,9 +1,76 @@
 function [LL,LM,RL,RM,S,I] = showbrainsurf(cdata,varargin)
-
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+% showbrainsurf, version 1.0
+%
+% Software provided with no warranty or guarantee
+%
+% Created by: Jon Dudley (jonathan.dudley@cchmc.org)
+% Last modified: 2022-04-25
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+%
+% Function to quickly render values (stats, cortical thickness, etc.) onto brain
+% surfaces, or to show atlas defined ROIs on the brain surface
+%
+% Usage:
+%   >> showbrainsurf;
+%       Allows user to select any subset of ROIs from one of five atlases for
+%       display. Two popup menus will appear, the first allowing selection of
+%       the atlas (see below) and the second allowing for the selection of any
+%       number of ROIs defined by that atlas. Each selected ROI will be
+%       displayed in a unique color selected from a set of maximally
+%       distinguishable colors based on the number of ROIs selected.
+%   >> [LL,LM,RL,RM,S,I] = showbrainsurf;
+%       Same as above, but also returns the six thumbnails corresponding to the
+%       left lateral, left medial, right lateral, right medial, superior, and
+%       inferior views of the brain surface, respectively.
+%   >> showbrainsurf(X);
+%       Where X is a n-by-1 or n-by-3 vector where each row corresponds to the
+%       coordinate or ROI defined by a given template/atlas. If X is n-by-1 (eg,
+%       cortical thickness in mm or a z-stat) it will map the values to a
+%       colormap based on the values of X (if min(X)>=0, it will map min(X) to
+%       max(X) on the colormap hot; if max(X)<=0, it will map min(X) to max(X)
+%       on a black-blue-white colormap; otherwise it will map -max(abs(X)) to
+%       max(abs(X)) on a blue-white-red colormap. If X is n-by-3, each row is
+%       taken to be an RGB color for mapping. The length of n can be:
+%           64984, where each row corresponds to a coordinate of the FSaverage
+%           template with ~2mm spacing (i.e., ~32k/hemisphere)
+%
+%           327684, where each row corresponds to a coordinate of the FSaverage
+%           template with ~1mm spacing (i.e., ~164k/hemisphere)
+%
+%           148, where each row corresponds to an ROI in the Destrieux atlas
+%
+%           70, where each row corresponds to an ROI in the Desikan-Killiany
+%           atlas
+%
+%           360, where each row corresponds to an ROI in the Human Connectome
+%           Project MultiModalParcellation atlas
+%
+%           333, where each row corresponds to an ROI in the Gordon functional
+%           parcellation atlas
+%
+%           100, 200, 400, or 600, where each row corresponds to an ROI in the
+%           Schaefer functional parcellation atlas of the given resolution
+%
+%   >> showbrainsurf(X,[min max]);
+%       Same as above, but first thresholds X between min and max
+%
+%
+%   This function utilizes the following 
+%
+%   read_annotation.m: Copyright © 2011 The General Hospital Corporation (Boston, MA) "MGH"
+%       Function from FreeSurfer
+%
+%   @gifti, @xmltree: Copyright (C) 2008 Wellcome Trust Centre for Neuroimaging
+%       These are classes defined in SPM for reading *.gii files   
+%
+%   distinguishable_colors.m: 2010-2011 by Timothy E. Holy
+%       https://www.mathworks.com/matlabcentral/fileexchange/29702-generate-maximally-perceptually-distinct-colorsCopyright 
+%
     pth = fileparts(which('showbrainsurf'));
     addpath(genpath(pth));
     if ~exist('cdata','var')
-        pickrois = 1;
+        pickrois = true;
         atlases = {'Gordon','Destrieux','DK40','HCP_MMP','Schaefer'};
         [sel,ok] = listdlg('ListString',atlases,'SelectionMode','single','PromptString','Which atlas do you want to view?');
         if ~ok
@@ -22,7 +89,7 @@ function [LL,LM,RL,RM,S,I] = showbrainsurf(cdata,varargin)
                 cdata = 0.5*ones(600,3);
         end
     else
-        pickrois = 0;
+        pickrois = false;
     end
     if size(cdata,2)==1
         if nargin==2
@@ -106,7 +173,6 @@ function [LL,LM,RL,RM,S,I] = showbrainsurf(cdata,varargin)
                 rdata(ri,:) = repmat(cdata(n,:),sum(ri),1);
             end
         otherwise % atlas-defined data
-%             addpath('C:\Users\duddb3\Documents\MATLAB\qcmon-master\assets\matlab\freesurfer\');
             adir = fullfile(pth,'templates','atlases_surfaces');
             tdir = fullfile(pth,'templates','templates_surfaces');
             L = gifti(fullfile(tdir,'lh.inflated.freesurfer.gii'));
