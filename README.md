@@ -1,7 +1,7 @@
 # ShowBrainSurf
 Function to quickly render values (stats, cortical thickness, etc.) onto brain surfaces, or to show atlas defined ROIs on the brain surface
 
-<bold>Example: Cohen's D effect sizes mapped onto the Gordon Atlas functional parcellation</bold> (333 ROIs; Gordon EM, et al. Cerebral Cortex, Volume 26, Issue 1, January 2016, Pages 288–303, https://doi.org/10.1093/cercor/bhu239)
+Example: Cohen's D effect sizes mapped onto the Gordon Atlas functional parcellation (333 ROIs; Gordon EM, et al. Cerebral Cortex, Volume 26, Issue 1, January 2016, Pages 288–303, https://doi.org/10.1093/cercor/bhu239)
 
 usage: showbrainsurf(X);
 
