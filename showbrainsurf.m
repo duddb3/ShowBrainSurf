@@ -177,7 +177,7 @@ function [LL,LM,RL,RM,S,I] = showbrainsurf(cdata,drange,surftype)
             tdir = fullfile(pth,'templates','templates_surfaces_32k');
             L = gifti(fullfile(tdir,['lh.' surfname]));
             R = gifti(fullfile(tdir,['rh.' surfname]));
-            gdir = 'C:\Users\duddb3\Documents\GordonAtlas\Parcels\';
+            gdir = fullfile(pth,'Gordon_atlas');
             GL = gifti(fullfile(gdir,'Parcels_L.func.gii'));
             GR = gifti(fullfile(gdir,'Parcels_R.func.gii'));
             if pickrois
