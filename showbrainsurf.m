@@ -177,7 +177,7 @@ function [LL,LM,RL,RM,S,I] = showbrainsurf(cdata,drange,surftype)
             tdir = fullfile(pth,'templates','templates_surfaces_32k');
             L = gifti(fullfile(tdir,['lh.' surfname]));
             R = gifti(fullfile(tdir,['rh.' surfname]));
-            gdir = 'C:\Users\duddb3\Documents\GordonAtlas\Parcels\';
+            gdir = fullfile(pth,'templates','Gordon_atlas');
             GL = gifti(fullfile(gdir,'Parcels_L.func.gii'));
             GR = gifti(fullfile(gdir,'Parcels_R.func.gii'));
             if pickrois
@@ -303,7 +303,7 @@ function [LL,LM,RL,RM,S,I] = showbrainsurf(cdata,drange,surftype)
     
     close(gcf)
     
-    figure,imshow([S LL LM; I RL RM]);
+    figure,imshow([LL S RL; LM I RM]);
     set(gcf,'Color','w')
     if pcb
         colormap(cmap)
