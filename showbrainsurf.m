@@ -211,6 +211,13 @@ function [LL,LM,RL,RM,S,I] = showbrainsurf(cdata,drange,surftype)
                     [~,llab,lctab] = read_annotation(fullfile(adir,'lh.aparc_a2009s.freesurfer.annot'),0);
                     [~,rlab,rctab] = read_annotation(fullfile(adir,'rh.aparc_a2009s.freesurfer.annot'),0);
                     idx = [2:42,44:76]; % skip "unknown" and "medial wall"
+                case 68 % DK40, but without corpus callosum listed
+                    [~,llab,lctab] = read_annotation(fullfile(adir,'lh.aparc_DK40.freesurfer.annot'),0);
+                    [~,rlab,rctab] = read_annotation(fullfile(adir,'rh.aparc_DK40.freesurfer.annot'),0);
+                    idx = [2:36]; % skip "unknown"
+                    % Insert null data for corpus callosum
+                    cdata = [cdata(1:3,:); repmat(NaN,1,size(cdata,2));...
+                        cdata(4:37,:); repmat(NaN,1,size(cdata,2)); cdata(38:end,:)];
                 case 70 % DK40
                     [~,llab,lctab] = read_annotation(fullfile(adir,'lh.aparc_DK40.freesurfer.annot'),0);
                     [~,rlab,rctab] = read_annotation(fullfile(adir,'rh.aparc_DK40.freesurfer.annot'),0);
